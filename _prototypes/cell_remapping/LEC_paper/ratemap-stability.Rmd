@@ -1,0 +1,684 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+# Install the required packages if they are not already installed
+if (!requireNamespace("readxl", quietly = TRUE)) {
+  install.packages("readxl")
+}
+
+if (!requireNamespace("dplyr", quietly = TRUE)) {
+  install.packages("dplyr")
+}
+
+rm(list = ls())
+library(dplyr)
+
+#
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\filtered_df.xlsx')
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_filtered.xlsx')
+# _only_keep.xlsx')
+df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_filtered_keep_swapped2.xlsx')
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_assigned_keep_swapped_fixed.xlsx')
+
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_unfiltered.xlsx')
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_assigned_only_keep.xlsx')
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\df_full_LEC_only_trace_cells.xlsx')
+
+# df <- readxl::read_excel('C:\\Users\\aaoun\\OneDrive - cumc.columbia.edu\\Desktop\\HussainiLab\\neuroscikit\\LEC_full_merged_scores_unfiltered.xlsx')
+
+df <- df %>% filter(score == 'field')
+
+# remove where isObject = 0
+# df <- df %>% filter(isTrace == 1)
+
+# remove session 4 through 7
+# df <- df %>% filter(session_id != 4 & session_id != 5 & session_id != 6 & session_id != 7)
+
+selected_groups <- c("NON", "ANT")  # Specify the groups you want to keep
+df <- df[df$group %in% selected_groups, ]
+df$group <- factor(df$group, levels = c("NON", "ANT"))  # Reorder factor levels
+
+# df_counts <- df %>% group_by(group, name, depth, date, stim, session_id) %>% summarize(count = n()) %>% ungroup()
+# # # change counts to sum to 1
+# df_counts <- df_counts %>% group_by(group) %>% mutate(count = count / sum(count)) %>% ungroup()
+
+# df <- df %>%
+#   filter(score == 'field') %>%
+#   group_by(group, name, depth, date, stim, session_id) %>%
+#   summarize_all(mean) %>%
+#   ungroup()
+
+# df$obj_q <- as.numeric(df$obj_q_NO)
+
+df$name <- factor(df$name)
+df$group <- factor(df$group)
+df$obj_w <- as.numeric(df$obj_w)
+df$obj_q <- as.numeric(df$obj_q)
+df$obj_q_NO <- as.numeric(df$obj_q_NO)
+df$neuron_id <- paste(df$tetrode, df$unit_id, sep = "_")
+df$group <- as.factor(df$group)
+# df$group <- relevel(df$group, ref = "control")
+df$session_id <- as.factor(df$session_id)
+# session_x --> x
+df$session_id <- gsub("session_", "", df$session_id)
+# cpmvert to numeric
+df$session_id <- as.numeric(df$session_id)
+
+epsilon <- .Machine$double.eps^0.25
+dependent_vars <- c("obj_q_NO")
+# dependent_vars <- c("firing_rate")
+
+
+for (dv in dependent_vars) {
+  if (dv == 'obj_q_NO') {
+    df[[dv]] <- ifelse(df[[dv]] == 1, 1 - epsilon, df[[dv]])
+    df[[dv]] <- ifelse(df[[dv]] == 0, epsilon, df[[dv]])
+  }
+}
+
+
+```
+
+```{r}
+#print column names
+colnames(df)
+# print df at column 'cell_type'
+# df$cell_type_numeric
+# print length an width of df
+print(dim(df))
+```
+
+
+
+```{r}
+
+# Define a function to fit a GLMM for a given dependent variable
+fit_model <- function(df, dependent_var) {
+  # Define the formula string
+  formula_str <- paste(dependent_var, " ~ (1|name) + group + session_id + group:session_id")
+  # + cell_type + group:cell_type + group:session_id:cell_type")
+  #  + object_location + cell_type")
+  # + cell_type + group:cell_type + group:session_id:cell_type")
+  #  + session_id:cell_type + group:cell_type + group:session_id:cell_type")
+  # + cell_type:session_id + cell_type:group + cell_type:group:session_id")
+  
+  # Convert the formula string to a formula
+  model_formula <- as.formula(formula_str)
+  
+  # Fit the model
+  if (dependent_var == 'obj_q_NO') {
+    model <- glmmTMB(model_formula, data = df, family = beta_family())
+  }
+# Gamma(link = "log")
+  if (dependent_var == 'obj_w') {
+  model <- glmmTMB(model_formula, data = df, family = Gamma(link = "log"), weights = df_counts$count)
+  }
+
+  if (dependent_var == 'firing_rate') {
+    model <- glmmTMB(model_formula, data = df, family = poisson(link = "log"))
+  }
+  
+  return(model)
+}
+
+# Install required packages
+if (!requireNamespace("glmmTMB", quietly = TRUE)) {
+  install.packages("glmmTMB")
+}
+
+if (!requireNamespace("DHARMa", quietly = TRUE)) {
+  install.packages("DHARMa")
+}
+
+# Load required packages
+library(glmmTMB)
+library(DHARMa)
+
+
+# Initialize a list to store the models
+models <- list()
+diagnostics <- list()
+
+# Loop over the dependent variables and fit a model for each
+for (dependent_var in dependent_vars) {
+  # Fit the model
+  model <- fit_model(df, dependent_var)
+
+  # Store the model in the list
+  models[[dependent_var]] <- model
+
+  # Diagnose the model
+  simulation_output <- simulateResiduals(fittedModel = model, n = 250)
+  dispersion_test <- testDispersion(simulation_output)
+  zero_inflation_test <- testZeroInflation(simulation_output)
+  outlier_test <- testOutliers(simulation_output)
+
+  # Store the diagnostics in a list
+  diagnostics[[dependent_var]] <- list("Simulation Output" = simulation_output,
+                                       "Dispersion Test" = dispersion_test,
+                                       "Zero Inflation Test" = zero_inflation_test,
+                                       "Outlier Test" = outlier_test)
+}
+
+# Now, models is a list containing the models for each dependent variable,
+# and diagnostics is a similar list containing the diagnostics for each model.
+```
+```{r}
+# Install required packages
+if (!requireNamespace("glmmTMB", quietly = TRUE)) {
+  install.packages("glmmTMB")
+}
+
+if (!requireNamespace("DHARMa", quietly = TRUE)) {
+  install.packages("DHARMa")
+}
+
+# Load required packages
+library(glmmTMB)
+library(DHARMa)
+
+# Define a function to fit a GLMM for a given dependent variable
+fit_model2 <- function(df, dependent_var, indices) {
+  # Sample data with replacement
+  sampled_data <- df[indices, ]
+  
+  # Define the formula string
+  formula_str <- paste(dependent_var, " ~ group + (1|name) + session_id + group:session_id + cell_type + group:cell_type + group:session_id:cell_type")
+  
+  # Convert the formula string to a formula
+  model_formula <- as.formula(formula_str)
+  
+  # Fit the model
+  if (dependent_var == 'obj_q_NO') {
+    model <- glmmTMB(model_formula, data = sampled_data, family = beta_family())
+  }
+  return(model)
+}
+
+# Specify the number of bootstrap samples
+num_bootstrap_samples <- 1000
+
+# Initialize a list to store the models
+models <- list()
+diagnostics <- list()
+
+# Loop over the dependent variables and fit a model for each
+for (dependent_var in dependent_vars) {
+  # Initialize lists to store bootstrap results
+  bootstrap_models <- list()
+  bootstrap_diagnostics <- list()
+  
+  # Perform bootstrap resampling
+  for (i in 1:num_bootstrap_samples) {
+    # Generate bootstrap indices
+    bootstrap_indices <- sample(nrow(df), replace = TRUE)
+    
+    # Fit the model on the bootstrap sample
+    bootstrap_model <- fit_model2(df, dependent_var, bootstrap_indices)
+    
+    # Store the bootstrap model
+    bootstrap_models[[i]] <- bootstrap_model
+    
+    # Diagnose the bootstrap model
+    simulation_output <- simulateResiduals(fittedModel = bootstrap_model, n = 250)
+    dispersion_test <- testDispersion(simulation_output)
+    zero_inflation_test <- testZeroInflation(simulation_output)
+    outlier_test <- testOutliers(simulation_output)
+    
+    # Store the bootstrap diagnostics
+    bootstrap_diagnostics[[i]] <- list("Simulation Output" = simulation_output,
+                                       "Dispersion Test" = dispersion_test,
+                                       "Zero Inflation Test" = zero_inflation_test,
+                                       "Outlier Test" = outlier_test)
+  }
+  
+  # Store the bootstrap results in the main lists
+  models[[dependent_var]] <- bootstrap_models
+  diagnostics[[dependent_var]] <- bootstrap_diagnostics
+}
+
+# Now, models is a list containing lists of models for each dependent variable (one list per bootstrap sample),
+# and diagnostics is a similar list containing lists of diagnostics for each model.
+
+```
+```{r}
+# Assuming df and dependent_var are already defined
+original_model <- fit_model(df, dependent_var)
+# get grouop:ANT coefficient
+original_coefficients <- summary(model)$coefficients$cond[, 1]
+
+# Assuming you have already run the bootstrap resampling code
+# bootstrap_coefficients <- lapply(models[[dependent_var]], coef)
+bootstrap_coefficients <- lapply(models[[dependent_var]], function(model) {
+  return(summary(model)$coefficients$cond[, 1])
+})
+
+# Calculate p-values for each coefficient
+p_values <- sapply(names(original_coefficients), function(var) {
+  original_coef <- original_coefficients[var]
+  bootstrap_coefs <- sapply(bootstrap_coefficients, function(boot_coef) boot_coef[var])
+  
+  # Calculate the proportion of bootstrap coefficients more extreme than the original coefficient
+  p_value <- mean(abs(bootstrap_coefs) >= abs(original_coef))
+  
+  return(p_value)
+})
+
+# Print p-values for each coefficient
+print("P-values for each coefficient:")
+print(p_values)
+
+```
+```{r}
+print(summary(model))
+
+```
+```{r}
+
+# original_coefficients <- summary(model)$coefficients$cond[, 1]
+
+# # Assuming you have already run the bootstrap resampling code
+# # bootstrap_coefficients <- lapply(models[[dependent_var]], coef)
+# bootstrap_coefficients <- lapply(models[[dependent_var]], function(model) {
+#   return(summary(model)$coefficients$cond[, 1])
+# })
+# - coef(original_model)
+
+# # Create a data frame to store coefficients for plotting
+# plot_data <- data.frame(
+#   Variable = character(),
+#   Estimate = numeric(),
+#   stringsAsFactors = FALSE
+# )
+
+# # Extract coefficients for plotting
+# for (var in names(original_coefficients)) {
+#   # Skip the intercept
+#   if (var == "(Intercept)") next
+  
+#   original_coef <- original_coefficients[var]
+  
+#   # Extract corresponding bootstrap coefficients for the variable
+#   bootstrap_coefs <- sapply(bootstrap_coefficients, function(boot_coef) boot_coef[var])
+  
+#   # Append results to the plot data
+#   plot_data <- rbind(
+#     plot_data,
+#     data.frame(Variable = var, Estimate = c(original_coef, bootstrap_coefs))
+#   )
+# }
+
+# # Plotting boxplots
+# boxplot(Estimate ~ Variable, data = plot_data, col = c("red", "lightblue"),
+#         main = "Distribution of Coefficients", ylab = "Estimate")
+
+```
+```{r}
+# Function to create the summary table
+create_summary_table <- function(models, diagnostics) {
+  # Initialize a data frame to store the results
+  summary_table <- data.frame(DependentVariable = character(),
+                                AIC = numeric(),
+                                BIC = numeric(),
+                                TreatmentEstimate = numeric(),
+                                TreatmentPvalue = numeric(),
+                                DispersionTestPvalue = numeric(),
+                                ZeroInflationTestPvalue = numeric(),
+                                OutlierTestPvalue = numeric())
+  # Loop over the dependent variables
+for (dependent_var in names(models)) {
+    # Get the model (assuming there's only one model per dependent variable)
+    model <- models[[dependent_var]]
+
+    # Get the diagnostics
+    diag <- diagnostics[[dependent_var]]
+
+    # Get the summary of the model
+    summary_model <- summary(model)
+
+    # Check if the treatment effect is in the model summary
+    # if ("B6" %in% rownames(coef(summary_model)$cond)) {
+      # Get the p-value for the treatment effect
+    treatment_pvalue <- coef(summary_model)$cond[, 4]["groupANT"][1]
+    treatment_estimate <- coef(summary_model)$cond[, 1]["groupANT"][1]
+    treatment_zvalue <- coef(summary_model)$cond[, 3]["groupANT"][1]
+    treatment_std_err <- coef(summary_model)$cond[, 2]["groupANT"][1]
+
+    session_pvalue <- coef(summary_model)$cond[, 4]["session_id"][1]
+    session_estimate <- coef(summary_model)$cond[, 1]["session_id"][1]
+    session_zvalue <- coef(summary_model)$cond[, 3]["session_id"][1]
+    session_std_err <- coef(summary_model)$cond[, 2]["session_id"][1]
+
+    interaction_pvalue <- coef(summary_model)$cond[, 4]["groupANT:session_id"][1]
+    interaction_estimate <- coef(summary_model)$cond[, 1]["groupANT:session_id"][1]
+    interaction_zvalue <- coef(summary_model)$cond[, 3]["groupANT:session_id"][1]
+    interaction_std_err <- coef(summary_model)$cond[, 2]["groupANT:session_id"][1]
+
+    intercept_pvalue <- coef(summary_model)$cond[, 4]["(Intercept)"][1]
+    intercept_estimate <- coef(summary_model)$cond[, 1]["(Intercept)"][1]
+    intercept_zvalue <- coef(summary_model)$cond[, 3]["(Intercept)"][1]
+    intercept_std_err <- coef(summary_model)$cond[, 2]["(Intercept)"][1]
+    
+    # } else {
+    #   # If the treatment effect is not in the model summary, assign NA
+    #   treatment_pvalue <- NA
+    #   treatment_estimate <- NA
+    # }
+    print(dependent_var)
+    print(treatment_pvalue)
+    print(treatment_estimate)
+    print(summary_model$AIC[1])
+    # print(summary_model$BIC) 
+    # print(diag$`Dispersion Test`$p.value, diag$`Zero Inflation Test`$p.value, diag$`Outlier Test`$p.value)
+
+    # Append a new row to the data frame
+    summary_table <- rbind(summary_table,
+                           data.frame(DependentVariable = dependent_var,
+                                      AIC = summary_model$AIC[1],
+                                      BIC = summary_model$AIC[2],
+                                      TreatmentEstimate = treatment_estimate,
+                                      TreatmentPvalue = treatment_pvalue,
+                                      TreatmentZvalue = treatment_zvalue,
+                                      TreatmentStdErr = treatment_std_err,
+                                      SessionEstimate = session_estimate,
+                                      SessionPvalue = session_pvalue,
+                                      SessionZvalue = session_zvalue,
+                                      SessionStdErr = session_std_err,
+                                      InteractionEstimate = interaction_estimate,
+                                      InteractionPvalue = interaction_pvalue,
+                                      InteractionZvalue = interaction_zvalue,
+                                      InteractionStdErr = interaction_std_err,
+                                      InterceptEstimate = intercept_estimate,
+                                      InterceptPvalue = intercept_pvalue,
+                                      InterceptZvalue = intercept_zvalue,
+                                      InterceptStdErr = intercept_std_err,
+                                      DispersionTestPvalue = diag$`Dispersion Test`$p.value,
+                                      ZeroInflationTestPvalue = diag$`Zero Inflation Test`$p.value,
+                                      OutlierTestPvalue = diag$`Outlier Test`$p.value))
+  }
+
+  return(summary_table)
+}
+
+# Call the function to create the summary table
+summary_table <- create_summary_table(models, diagnostics)
+print(summary_table)
+# to dataframe
+summary_table <- as.data.frame(summary_table)
+# write.csv(summary_table, "./testing1234.csv")
+```
+
+```{r}
+
+# Assuming 'model' is your fitted beta regression model
+fitted_values <- predict(model, type = "response")
+# observed_values <- response_variable # Replace with your actual response variable
+observed_values <- df$obj_q_NO
+
+plot(fitted_values, observed_values, main = "Model Fit", xlab = "Fitted Values", ylab = "Observed Values")
+abline(a = 0, b = 1, col = "red")  # Diagonal line for reference
+
+```
+
+```{r}
+
+# Assuming 'model' is your fitted beta regression model
+library(MASS)  # For the truehist function
+
+# Obtain fitted values and residuals
+fitted_values <- predict(model, type = "response")
+residuals <- resid(model, type = "response")
+
+# Linearity
+plot(fitted_values, residuals, main = "Linearity Check", xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red")
+
+# Independence of Residuals
+plot(residuals ~ fitted_values, main = "Independence Check", xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red")
+
+# Normality of Residuals
+par(mfrow = c(1, 2))
+truehist(residuals, main = "Histogram of Residuals", col = "lightblue")
+qqnorm(residuals, main = "Q-Q Plot")
+qqline(residuals, col = 2)
+```
+
+
+```{r}
+
+# Loop over the dependent variables
+for (dependent_var in names(models)) {
+  # Print the dependent variable
+  cat("\n-------------------- ")
+  cat("Dependent variable:", dependent_var)
+  cat(" --------------------\n")
+  # Print the model summary
+  cat("\nModel summary:\n")
+  print(summary(models[[dependent_var]]))
+  # Print the diagnostics
+  cat("\nDiagnostics:\n")
+  print(diagnostics[[dependent_var]]$`Dispersion Test`)
+  print(diagnostics[[dependent_var]]$`Zero Inflation Test`)
+  print(diagnostics[[dependent_var]]$`Outlier Test`)
+}
+
+
+
+```
+
+```{r}
+print(est$cond)
+```
+
+```{r}
+# Initialize an empty data frame
+results <- data.frame()
+# Loop over the models
+for (var in names(models)) {
+  # Get the model (assuming there's only one model per dependent variable)
+  model <- models[[var]]
+  # Get the coefficient estimates and confidence intervals
+  # ci <- confint(model)[1:2, ]
+  ci <- confint(model)
+  
+  est <- summary(model)$coefficients
+
+  # Reset the row names of the 'est' dataframe
+  rownames(est) <- NULL
+  # rownames(ci) <- NULL
+  # Calculate the odds ratios
+  or_ci <- exp(ci)
+  # print(ci[, 1][1:4])
+
+  # Determine the type of coefficient (Intercept or Treatment)
+  # coef_type <- ifelse(startsWith(names(est$cond[, 1]), "(Intercept)"), "Intercept", "Treatment")
+  coef_type <- est$cond[, 1]
+  # Add the results to the data frame
+  results <- rbind(results, data.frame(
+    DependentVariable = var,
+    CoefficientType = coef_type,
+    Coefficient = as.numeric(est$cond[, 1]),
+    Error = as.numeric(est$cond[, 2]),
+    Pvalue = as.numeric(est$cond[, 4]),
+    Zvalue = as.numeric(est$cond[, 3]),
+    CI_lower = as.numeric(ci[, 1][1:4]),
+    CI_upper = as.numeric(ci[, 2][1:4]),
+    OddsRatio = as.numeric(or_ci[, 3][1:4]),
+    OR_CI_lower = as.numeric(or_ci[, 1][1:4]),
+    OR_CI_upper = as.numeric(or_ci[, 2][1:4])
+  ))
+}
+# Print the results
+# write.csv(results, "./LEC_model_report/NONvsANT_quantile_indiv_beta_field.csv")
+print(results)
+```
+
+```{r}
+# Check if there are any NA or missing values
+sum(is.na(results$OddsRatio))
+sum(is.na(results$OR_CI_lower))
+sum(is.na(results$OR_CI_upper))
+
+# Check the data type of the columns
+class(results$OddsRatio)
+class(results$OR_CI_lower)
+class(results$OR_CI_upper)
+
+```
+
+
+```{r}
+# Load the necessary library
+library(ggplot2)
+
+# Loop over the unique dependent variables
+for (var in unique(results$DependentVariable)) {
+  # Subset the data for the current dependent variable
+  subset <- results[results$DependentVariable == var & results$CoefficientType == "Treatment",]
+  # Create a named vector with the new names
+  varstrings <- c("obj_q")
+
+
+  
+  # Create the plot
+  p <- ggplot(subset, aes(x = group, y = OddsRatio, group = CoefficientType)) +
+    geom_line(aes(color = CoefficientType)) +
+    geom_ribbon(aes(ymin = OR_CI_lower, ymax = OR_CI_upper), alpha = 0.2) +
+    geom_hline(yintercept = 1, linetype = "dashed") +
+    labs(title = paste("Treatment Effect Trends for", varstrings[var]),
+         x = "Session Map",
+         y = "Odds Ratio") +
+    theme_minimal()
+  p <- p + theme(legend.position = "none")
+  
+  # Print the plot
+  print(p)
+}
+
+
+```
+
+
+
+
+
+```{r}
+# Load the necessary library
+library(knitr)
+
+# Create the markdown table
+results %>%
+  kable(format = "markdown")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Load necessary library
+library(ggplot2)
+
+Create histograms
+# ggplot(df, aes(x=obj_q)) + 
+#   geom_histogram(bins=50) + 
+#   facet_grid(group ~ .) + 
+#   theme_minimal() +
+#   labs(title="Distribution of Quantile by Group")
+
+ggplot(df, aes(x=obj_w)) + 
+  geom_histogram(bins=50) + 
+  facet_grid(group ~ .) + 
+  theme_minimal() +
+  labs(title="Distribution of EMD distance by Group")
+
+# ggplot(df, aes(x=firing_rate)) + 
+#   geom_histogram(bins=50) + 
+#   facet_grid(group ~ .) + 
+#   theme_minimal() +
+#   labs(title="Distribution of firing rate by Group")
+
+# Run Shapiro-Wilk normality tests
+shapiro.test(df$obj_q[df$group == "B6"])
+shapiro.test(df$obj_q[df$group == "ANT"])
+
+shapiro.test(df$obj_w[df$group == "B6"])
+shapiro.test(df$obj_w[df$group == "ANT"])
+
+shapiro.test(df$firing_rate[df$group == "B6"])
+shapiro.test(df$firing_rate[df$group == "ANT"])
+
+```
+
+```{r}
+range(df$obj_q, na.rm = TRUE)
+```
+
+
+```{r}
+# Install and load the necessary package
+# install.packages("glmmTMB")
+library(glmmTMB)
+
+# Fit the model
+model <- glmmTMB(obj_q ~ group + (1|name) + (1|session_id), 
+                 data = df, 
+                 family = beta_family())
+
+# Print the model summary
+summary(model)
+```
+
+```{r}
+library(DHARMa)
+model_simulated <- simulateResiduals(fittedModel = model, n = 250)
+plot(model_simulated)
+testDispersion(model_simulated)
+dotplot(ranef(model, condVar = TRUE))
+testZeroInflation(model_simulated)
+testOutliers(model_simulated)
+```
+
+
+```{r}
+# Split the data by session_id
+split_data <- split(df, df$session_id)
+
+# Initialize a list to store the models
+models <- list()
+
+# Loop over the split data and fit a model for each subset
+for(i in seq_along(split_data)) {
+  # Fit the model
+  model <- glmmTMB(quantile ~ group + (1|name), 
+                   data = split_data[[i]], 
+                   family = beta_family())
+  
+  # Store the model in the list
+  models[[i]] <- model
+}
+
+# Now models[[1]], models[[2]], models[[3]] contain the models for each subset of the data
+
+```
+
+```{r}
+summary(models[[3]])
+```
+
+
+

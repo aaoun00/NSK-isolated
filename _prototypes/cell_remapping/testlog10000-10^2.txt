@@ -1,0 +1,351 @@
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet1
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet2
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet3
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet4
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet1
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet2
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet3
+DECODING PPM FROM FILE
+PPM HERE:  300.0
+Session animal ID set: sub2_tet4
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+Using matched cut files
+Session data added, spikes sorted by cell
+here
+session 1, cell 1
+session 1, cell 2
+session 1, cell 3
+session 1, cell 4
+session 2, cell 1
+session 2, cell 2
+session 2, cell 3
+session 2, cell 4
+session 1, cell 1
+session 1, cell 2
+session 1, cell 3
+session 1, cell 4
+session 2, cell 1
+session 2, cell 2
+session 2, cell 3
+session 2, cell 4
+session 1, cell 1
+session 1, cell 2
+session 1, cell 3
+session 1, cell 4
+session 2, cell 1
+session 2, cell 2
+session 2, cell 3
+session 2, cell 4
+session 1, cell 1
+session 1, cell 2
+session 1, cell 3
+session 1, cell 4
+session 2, cell 1
+session 2, cell 2
+session 2, cell 3
+session 2, cell 4
+Cell 1
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 2
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 3
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 4
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 1
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 2
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 3
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 4
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 1
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 2
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 3
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 4
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 1
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 2
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 3
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+Cell 4
+session_1
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-0 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.83333333] [55.95]
+session_2
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-([0-9]+)([a-zA-Z]+)([^-]+)\-([^-]+)$ <function split_name_date_angle_apple_angle_angle at 0x000001F384E7BD00>
+B6-LEC1_20151211-cylinder-90 ^B6-LEC1_[0-9]{8}\-cylinder\-([^-]+)$ <function split_name_date_word_angle at 0x000001F384EA0700>
+SEARCHTHIS
+[57.18333333] [58.88333333]
+(10000, 812) (10000, 812)
+to_plot:  (8120000,)
+to_plot:  (8120000,)
+to_plot:  (10000,)
+SAVING OUTPUT FOR DIRECTORY C:/Users/aaoun/OneDrive - cumc.columbia.edu/Desktop/HussainiLab/neuroscikit_test_data/DatewiseSingle2\sub2
+signature
+0
+depth
+0
+name
+0
+date
+0
+tetrode
+0
+unit_id
+0
+session_ids
+0
+cumulative_wass
+0
+score
+0
+field_count
+0
+bin_area
+0
+arena_size
+0
+cumulative_coverage
+0
+cumulative_area
+0
+cumulative_rate
+0
+cylinder
+0
+ratemap_dims
+0
+Total run time: 27528.752418994904
+COMPLETED ALL FOLDERS
+Total run time: 27528.752418994904
