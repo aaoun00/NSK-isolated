@@ -66,7 +66,7 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
     headers_dict = dict()
 
     for i, header in enumerate(headers):
-        headers_dict[header] = get_column_letter(i+4)
+        headers_dict[header] = get_column_letter(i+1)
 
     file_name = os.path.join(root_path, "ap_parameters.txt")
     with open(file_name, 'w') as f:
@@ -89,7 +89,7 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
     one_for_parent_wb = xl.Workbook()
     sum_sheet = one_for_parent_wb['Sheet']
     sum_sheet.title = 'Summary'
-    sum_sheet['A' + str(1)] = 'Session'
+    # sum_sheet['A' + str(1)] = 'Session'
     visited = []
     for animalID in sorted_animal_ids:
         animal = study.get_animal_by_id(animalID)
@@ -119,6 +119,13 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
             c = 0
 
             pos_obj = session.get_position_data()['position']
+            spike_cluster = session.get_spike_data()["spike_cluster"]
+            spike_param_dict = spike_cluster.spikeparam
+
+
+            dateandtime = spike_param_dict["datetime"] # datetime object (NOT SAVED)
+            trial_time = str(dateandtime.strftime("%H:%M:%S")) # STR
+
             pos_file = session.session_metadata.file_paths['pos']
 
             # root_path
@@ -149,12 +156,29 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
 
 
                 excel_cell_index = per_animal_tracker
-                current_statistics_sheet['A' + str(excel_cell_index+1)] = signature
-                
+                current_statistics_sheet[headers_dict['signature'] + str(excel_cell_index+1)] = signature
+                current_statistics_sheet[headers_dict['tetrode'] + str(excel_cell_index+1)] = tet_file[-1]
+                current_statistics_sheet[headers_dict['date'] + str(excel_cell_index+1)] = date 
+                current_statistics_sheet[headers_dict['trial_time'] + str(excel_cell_index+1)] = trial_time
+                current_statistics_sheet[headers_dict['name'] + str(excel_cell_index+1)] = name
+                current_statistics_sheet[headers_dict['depth'] + str(excel_cell_index+1)] = depth  
+                current_statistics_sheet[headers_dict['stim'] + str(excel_cell_index+1)] = stim
+                current_statistics_sheet[headers_dict['total_area'] + str(excel_cell_index+1)] = ap_stats[0]
+                current_statistics_sheet[headers_dict['total_filled'] + str(excel_cell_index+1)] = ap_stats[1]
+                current_statistics_sheet[headers_dict['coverage'] + str(excel_cell_index+1)] = ap_stats[2]
+                current_statistics_sheet[headers_dict['min_speed'] + str(excel_cell_index+1)] = np.min(ap_stats[4])
+                current_statistics_sheet[headers_dict['min_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
+                current_statistics_sheet[headers_dict['max_speed'] + str(excel_cell_index+1)] = np.max(ap_stats[4])
+                current_statistics_sheet[headers_dict['max_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
+                current_statistics_sheet[headers_dict['mean_speed'] + str(excel_cell_index+1)] = np.mean(ap_stats[4])
+                current_statistics_sheet[headers_dict['mean_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
+                current_statistics_sheet[headers_dict['median_speed'] + str(excel_cell_index+1)] = np.median(ap_stats[4])
+                current_statistics_sheet[headers_dict['median_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
+                current_statistics_sheet[headers_dict['distance'] + str(excel_cell_index+1)] = ap_stats[3]
+                current_statistics_sheet[headers_dict['distance_units'] + str(excel_cell_index+1)] = 'cm'
+                       
                 ColumnDimension(current_statistics_sheet, bestFit=True)
-                print("Cell " + str(excel_cell_index) + " is complete")
                 per_animal_tracker += 1
-                #     # -------------------------------------------------------- #
 
             k += 1
 
@@ -595,37 +619,41 @@ def get_animal_performance(posfile, save_figures_directory, settings_dict):
     print('total filled: %f' % total_filled)
     percent = total_filled / total_area
     print('Coverage(Percent): %f' % (100*total_filled/total_area))
-    return total_area, total_filled, percent
+
+    speed = speed2D(posx, posy, post)
+
+    return total_area, total_filled, percent, total_distance, speed
 
 
 def _save_wb(wb, root_path, animal_id=None, sum_sheet_count=None):
     wb._sheets = sorted(wb._sheets, key=lambda x: x.title)
+    
     if animal_id is None:
         if sum_sheet_count is None:
-            pth = root_path + '/shuffle_sheet'  + '.xlsx'
+            pth = root_path + '/animal_performance'  + '.xlsx'
         else:
-            pth = root_path + '/shuffle_sheet_'  + str(sum_sheet_count) + '.xlsx'
+            pth = root_path + '/animal_performance_'  + str(sum_sheet_count) + '.xlsx'
     else:
-        pth = root_path + '/shuffle_sheet_' + str(animal_id)  + '.xlsx'
+        pth = root_path + '/animal_performance_' + str(animal_id)  + '.xlsx'
     print(root_path)
     wb.save(pth)
     wb.close()
 
-    xls = pd.read_excel(pth, sheet_name=None)
-    df_sum = xls.pop('Summary')
-    dfs = [df.sort_values(['Session', 'Tetrode', 'Cell ID']) for df in xls.values()]
-    with pd.ExcelWriter(pth, engine='xlsxwriter') as writer:
-        df_sum.to_excel(writer, sheet_name='Summary', index=False)
-        for sheet, df in zip(xls.keys(), dfs):
-            df.to_excel(writer, sheet_name=sheet, index=False)
+    # xls = pd.read_excel(pth, sheet_name=None)
+    # df_sum = xls.pop('Summary')
+    # dfs = [df.sort_values(['name','date','trial_time','depth','stim']) for df in xls.values()]
+    # with pd.ExcelWriter(pth, engine='xlsxwriter') as writer:
+    #     df_sum.to_excel(writer, sheet_name='Summary', index=False)
+    #     for sheet, df in zip(xls.keys(), dfs):
+    #         df.to_excel(writer, sheet_name=sheet, index=False)
 
 
     
-        if len(dfs) > 0:
-            df_sum = pd.concat(dfs, axis=0).sort_values(['Session', 'Tetrode', 'Cell ID'])
-        else:
-            df_sum = df_sum.sort_values(['Session', 'Tetrode', 'Cell ID'])
-        df_sum.to_excel(writer, sheet_name="Summary", index=True)
+    #     if len(dfs) > 0:
+    #         df_sum = pd.concat(dfs, axis=0).sort_values(['name','date','trial_time','depth','stim'])
+    #     else:
+    #         df_sum = df_sum.sort_values(['name','date','trial_time','depth','stim'])
+    #     df_sum.to_excel(writer, sheet_name="Summary", index=True)
     # writer.save()
     print('Saved ' + str(pth))
 
@@ -654,26 +682,41 @@ def circle_vals(x, y, d, ang):
     yp = np.add(yp, y)
     return xp.reshape((len(xp), 1)), yp.reshape((len(yp), 1))
 
+def speed2D(x, y, t):
+    """calculates an averaged/smoothed speed"""
+
+    N = len(x)
+    v = np.zeros((N, 1))
+
+    for index in range(1, N-1):
+        v[index] = np.sqrt((x[index + 1] - x[index - 1]) ** 2 + (y[index + 1] - y[index - 1]) ** 2) / (
+        t[index + 1] - t[index - 1])
+
+    v[0] = v[1]
+    v[-1] = v[-2]
+
+    return v
+
+
 if __name__ == '__main__':
 
     ######################################################## EDIT BELOW HERE ########################################################
 
     csv_header = {}
-    csv_header_keys = ['name','date','depth','stim','information', 'shuffled_information_mean','shuffled_information_std','p_value_information',
-                       'selectivity', 'shuffled_selectivity_mean', 'shuffled_selectivity_std', 'p_value_selectivity',
-                       'sparsity', 'shuffled_sparsity_mean', 'shuffled_sparsity_std', 'p_value_sparsity',
-                       'coherence', 'shuffled_coherence_mean', 'shuffled_coherence_std', 'p_value_coherence',
-                       'shuffled_offset']
+    csv_header_keys = ['signature', 'tetrode', 'name','date','trial_time','depth','stim', 'total_area', 'total_filled', 'coverage', 'min_speed',
+                       'min_speed_units', 'max_speed', 'max_speed_units', 'mean_speed', 'mean_speed_units', 'median_speed',
+                          'median_speed_units', 'distance', 'distance_units']
+                       
     for key in csv_header_keys:
         csv_header[key] = True
 
     tasks = {}
-    task_keys = ['information']
+    task_keys = []
     for key in task_keys:
         tasks[key] = True
 
     plotTasks = {}
-    plot_task_keys = ['Spikes_Over_Position_Map', 'Tuning_Curve_Plots', 'Firing_Rate_vs_Speed_Plots', 'Firing_Rate_vs_Time_Plots','autocorr_map', 'binary_map','rate_map', 'occupancy_map']
+    plot_task_keys = []
     for key in plot_task_keys:
         plotTasks[key] = True
 
@@ -684,7 +727,7 @@ if __name__ == '__main__':
     session_settings = {'channel_count': 4, 'animal': animal, 'devices': devices, 'implant': implant}
 
     """ FOR YOU TO EDIT """
-    settings = {'ppm': 485, 'session':  session_settings, 'smoothing_factor': 3, 'useMatchedCut': True}
+    settings = {'ppm': 485, 'session':  session_settings, 'smoothing_factor': 3, 'useMatchedCut': False}
     """ FOR YOU TO EDIT """
 
     tasks['disk_arena'] = True # -->
