@@ -174,7 +174,7 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                 current_statistics_sheet[headers_dict['mean_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
                 current_statistics_sheet[headers_dict['median_speed'] + str(excel_cell_index+1)] = np.median(ap_stats[4])
                 current_statistics_sheet[headers_dict['median_speed_units'] + str(excel_cell_index+1)] = 'cm/s'
-                current_statistics_sheet[headers_dict['distance'] + str(excel_cell_index+1)] = ap_stats[3]
+                current_statistics_sheet[headers_dict['total_distance'] + str(excel_cell_index+1)] = ap_stats[3]
                 current_statistics_sheet[headers_dict['distance_units'] + str(excel_cell_index+1)] = 'cm'
                        
                 ColumnDimension(current_statistics_sheet, bestFit=True)
@@ -705,7 +705,7 @@ if __name__ == '__main__':
     csv_header = {}
     csv_header_keys = ['signature', 'tetrode', 'name','date','trial_time','depth','stim', 'total_area', 'total_filled', 'coverage', 'min_speed',
                        'min_speed_units', 'max_speed', 'max_speed_units', 'mean_speed', 'mean_speed_units', 'median_speed',
-                          'median_speed_units', 'distance', 'distance_units']
+                          'median_speed_units', 'total_distance', 'distance_units']
                        
     for key in csv_header_keys:
         csv_header[key] = True
