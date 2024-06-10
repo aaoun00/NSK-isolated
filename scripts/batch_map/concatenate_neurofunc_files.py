@@ -24,7 +24,10 @@ def concatenate_neurofunc(data_dir, settings):
             fp = os.path.join(data_dir, file)
 
             xls = pd.read_excel(fp, sheet_name=None)
-            df = xls.pop('Summary')
+            try:
+                df = xls.pop('Summary')
+            except:
+                df = xls.pop('Sheet1')
 
             if isFirst:
 
@@ -47,13 +50,18 @@ def concatenate_neurofunc(data_dir, settings):
 
                 concat_df = pd.concat((concat_df, df))
 
+    # drop unnamed columns 
+    concat_df = concat_df.loc[:, ~concat_df.columns.str.contains('^Unnamed')]
+    # reset index column
+    concat_df.reset_index(drop=True, inplace=True)
+
     if settings['output_file_name'] is None:
         save_path = data_dir + '/combined.xlsx'
     else:
         save_path = data_dir + '/' + settings['output_file_name'] + '.xlsx'
 
     with pd.ExcelWriter(save_path, engine='xlsxwriter') as writer:
-        concat_df.to_excel(writer, sheet_name="Summary", index=True)
+        concat_df.to_excel(writer, sheet_name="Summary", index=False)
         
     print('saved at ' + save_path)
 
