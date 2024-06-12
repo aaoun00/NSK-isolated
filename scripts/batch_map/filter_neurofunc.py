@@ -163,7 +163,10 @@ def filter_neurofunc_unmatched_object(file_dir, settings):
         ses_dict[ses]['Date'] = date
         ses_dict[ses][settings['type']] = stim
 
-        date = pd.to_datetime(date,format='%Y%m%d').date()
+        try:
+            date = pd.to_datetime(date,format='%Y%m%d').date()
+        except:
+            date = pd.to_datetime(date,format='%d%m%Y').date()
 
         if date not in date_depth_dict:
             date_depth_dict[date] = {}
