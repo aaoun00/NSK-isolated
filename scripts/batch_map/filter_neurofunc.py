@@ -166,7 +166,7 @@ def filter_neurofunc_unmatched_object(file_dir, settings):
         if settings['naming_type'] != 'LC':
             date = pd.to_datetime(date,format='%Y%m%d').date()
         else:
-            date = pd.to_datetime(date,format='%d%m%Y').date()
+            date = pd.to_datetime(date,format='%m%d%Y').date()
 
         if date not in date_depth_dict:
             date_depth_dict[date] = {}
