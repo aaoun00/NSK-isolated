@@ -154,7 +154,8 @@ def filter_neurofunc_unmatched_object(file_dir, settings):
         print(checked)
 
         assert len(checked) == 4 
-        assert not isinstance(checked[0], type(None)) and not isinstance(checked[0], list)
+        if settings['naming_type'] == 'LEC':
+            assert not isinstance(checked[0], type(None)) and not isinstance(checked[0], list)
         stim, depth, name, date = checked
 
         ses_dict[ses]['Name'] = name
