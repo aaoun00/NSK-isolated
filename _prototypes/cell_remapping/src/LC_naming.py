@@ -6,7 +6,7 @@ def split_filename(filename):
     # index of the item with um in it
     split_item_index = [i for i, item in enumerate(filename.split('-')) if 'um' in str(item.lower())]
     assert len(split_item_index) == 1, f'Found more than one item or no items with um in it: {split_item_index}'
-    depth = filename.split('-')[split_item_index[0]]
+    depth = filename.split('-')[split_item_index[0]].split('um')[0]
     blank = None
 
     return blank, depth, name, date
