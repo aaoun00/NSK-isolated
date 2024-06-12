@@ -120,8 +120,8 @@ def filter_neurofunc_unmatched_object(file_dir, settings):
         # ses = row['Session']
         ses_dict[ses] = {}
 
-        if '-CAGE-' in ses:
-            continue
+        # if '-CAGE-' in ses:
+        #     continue
 
         fname = ses
 
