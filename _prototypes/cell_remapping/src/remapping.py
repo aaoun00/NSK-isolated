@@ -997,19 +997,25 @@ def compute_remapping(study, settings, data_dir):
                         while os.path.isfile(data_dir + '/remapping_output/regular_remapping_' + str(counter) + '.xlsx'):
                             counter += 1
                         regular_path_to_use = data_dir + '/remapping_output/regular_remapping_' + str(counter) + '.xlsx'
-                    writer = pd.ExcelWriter(regular_path_to_use, engine='openpyxl')
-                    df.to_excel(writer, sheet_name='Summary')
-                    writer.save()
-                    writer.close()
+                    # writer = pd.ExcelWriter(regular_path_to_use, engine='openpyxl')
+                    # df.to_excel(writer, sheet_name='Summary')
+                    # writer.save()
+                    # writer.close()
+                    with pd.ExcelWriter(regular_path_to_use, engine='openpyxl') as writer:
+                        df.to_excel(writer, sheet_name='Summary')
 
                 else:
                     book = load_workbook(regular_path_to_use)
-                    writer = pd.ExcelWriter(regular_path_to_use, engine='openpyxl')
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
-                    writer.close()
-                    book.save(regular_path_to_use)
+                    sheet = book['Summary']
+                    startrow = sheet.max_row
+                    with pd.ExcelWriter(regular_path_to_use, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                        df.to_excel(writer, sheet_name='Summary', header=False, startrow=startrow)
+                    # writer = pd.ExcelWriter(regular_path_to_use, engine='openpyxl')
+                    # writer.book = book
+                    # writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                    # df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
+                    # writer.close()
+                    # book.save(regular_path_to_use)
 
             if settings['hasObject']:
                 df = pd.DataFrame(to_save['object'])
@@ -1022,18 +1028,23 @@ def compute_remapping(study, settings, data_dir):
                         while os.path.isfile(data_dir + '/remapping_output/obj_remapping_' + str(counter) + '.xlsx'):
                             counter += 1
                         obj_path_to_use = data_dir + '/remapping_output/obj_remapping_' + str(counter) + '.xlsx'
-                    writer = pd.ExcelWriter(obj_path_to_use, engine='openpyxl')
-                    df.to_excel(writer, sheet_name='Summary')
-                    writer.save()
-                    writer.close()
+                    # writer = pd.ExcelWriter(obj_path_to_use, engine='openpyxl')
+                    with pd.ExcelWriter(obj_path_to_use, engine='openpyxl') as writer:
+                        df.to_excel(writer, sheet_name='Summary')
+                    # writer.save()
+                    # writer.close()
                 else:
                     book = load_workbook(obj_path_to_use)
-                    writer = pd.ExcelWriter(obj_path_to_use, engine='openpyxl')
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
-                    writer.close()
-                    book.save(obj_path_to_use)
+                    sheet = book['Summary']
+                    startrow = sheet.max_row
+                    with pd.ExcelWriter(obj_path_to_use, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                        df.to_excel(writer, sheet_name='Summary', header=False, startrow=startrow)
+                    # writer = pd.ExcelWriter(obj_path_to_use, engine='openpyxl')
+                    # writer.book = book
+                    # writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                    # df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
+                    # writer.close()
+                    # book.save(obj_path_to_use)
             
             if settings['runFields']:
                 df = pd.DataFrame(to_save['centroid'])
@@ -1098,19 +1109,26 @@ def compute_remapping(study, settings, data_dir):
                         while os.path.isfile(data_dir + '/remapping_output/temporal_remapping_' + str(counter) + '.xlsx'):
                             counter += 1
                         temporal_path_to_use = data_dir + '/remapping_output/temporal_remapping_' + str(counter) + '.xlsx'
-                    writer = pd.ExcelWriter(temporal_path_to_use, engine='openpyxl')
-                    df.to_excel(writer, sheet_name='Summary')
-                    writer.save()
-                    writer.close()
+                    # writer = pd.ExcelWriter(temporal_path_to_use, engine='openpyxl')
+                    with pd.ExcelWriter(temporal_path_to_use, engine='openpyxl') as writer:
+                        df.to_excel(writer, sheet_name='Summary')
+                    # writer.save()
+                    # writer.close()
                 else:
                     book = load_workbook(temporal_path_to_use)
-                    writer = pd.ExcelWriter(temporal_path_to_use, engine='openpyxl')
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
-                    # writer.save()
-                    writer.close()
-                    book.save(temporal_path_to_use)
+                    # writer = pd.ExcelWriter(temporal_path_to_use, engine='openpyxl')
+                    # if not any(sheet.sheet_state == 'visible' for sheet in book.worksheets):
+                    #     book.active.sheet_state = 'visible'
+                    sheet = book['Summary']
+                    startrow = sheet.max_row
+                    with pd.ExcelWriter(temporal_path_to_use, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                        # writer.book = book
+                        # writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                        # df.to_excel(writer, sheet_name='Summary', header=False, startrow=writer.sheets['Summary'].max_row)
+                        # writer.save()
+                        df.to_excel(writer, sheet_name='Summary', header=False, startrow=startrow)
+                        # writer.close()
+                    # book.save(temporal_path_to_use)
             if settings['runUniqueOnlyTemporal']:
                 for context in to_save['context_temporal']:
                     df = pd.DataFrame(to_save['context_temporal'][context])
