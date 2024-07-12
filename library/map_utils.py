@@ -228,7 +228,7 @@ def _gkern(kernlen: int, std: int) -> np.ndarray:
                 gkern2d
     '''
 
-    gkern1d = signal.gaussian(kernlen, std=std).reshape(kernlen, 1)
+    gkern1d = signal.windows.gaussian(kernlen, std=std).reshape(kernlen, 1)
     gkern2d = np.outer(gkern1d, gkern1d)
     return gkern2d
 
