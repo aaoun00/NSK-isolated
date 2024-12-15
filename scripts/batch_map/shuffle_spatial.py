@@ -10,6 +10,10 @@ import warnings
 from library.study_space import Session, Study, Animal
 from scripts.batch_map.LEC_naming import LEC_naming_format, extract_name_lec
 from _prototypes.cell_remapping.src.MEC_naming import MEC_naming_format, extract_name_mec
+from _prototypes.cell_remapping.src.LC_naming import LC_naming_format, extract_name_lc
+from _prototypes.cell_remapping.src.Hande_naming import Hande_naming_format, extract_name_hande
+
+
 import tkinter as tk
 from tkinter import filedialog
 import time
@@ -128,30 +132,35 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
     sum_sheet['B' + str(1)] = 'Tetrode'
     sum_sheet['C' + str(1)] = 'Cell ID'
 
-    # # grid_control_npy = []  
-    # # border_control_npy = [] 
-    # # information_control_npy = []
+    # grid_control_npy = []  
+    # border_control_npy = [] 
+    # information_control_npy = []
 
-    # grid_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/grid_control_dist3.npy"
+    # grid_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/grid_control_dist.npy"
     # if os.path.exists(grid_path):
     #     grid_control_npy = np.load(grid_path)
     #     assert len(grid_control_npy) > 0
     # else:
     #     grid_control_npy = []
 
-    # border_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/border_control_dist3.npy"
+    # border_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/border_control_dist.npy"
     # if os.path.exists(border_path):
     #     border_control_npy = np.load(border_path)
     #     assert len(border_control_npy) > 0
     # else:
     #     border_control_npy = []
 
-    # information_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/information_control_dist3.npy"
-    # if os.path.exists(information_path):
-    #     information_control_npy = np.load(information_path)
-    #     assert len(information_control_npy) > 0
-    # else:
-    #     information_control_npy = []
+    information_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/information_control_dist.npy"
+    # information_path_labels = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/information_control_dist_labels.npy"
+    if os.path.exists(information_path):
+        information_control_npy = np.load(information_path)
+        assert len(information_control_npy) > 0
+        # information_control_npy_labels = np.load(information_path_labels)
+        # assert len(information_control_npy_labels) > 0
+        # assert len(information_control_npy_labels) == len(information_control_npy)
+    else:
+        information_control_npy = []
+        # information_control_npy_labels = []
 
 
     for animalID in sorted_animal_ids:
@@ -222,9 +231,12 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                 elif settings['naming_type'] == 'MEC':
                         name = extract_name_mec(signature)
                         formats = MEC_naming_format
-                # elif settings['naming_type'] == 'LC':
-                #     name = extract_name_lc(fname)
-                #     formats = LC_naming_format
+                elif settings['naming_type'] == 'LC':
+                    name = extract_name_lc(fname)
+                    formats = LC_naming_format
+                elif settings['naming_type'] == 'Hande':
+                    name = extract_name_hande(fname)
+                    formats = Hande_naming_format
 
                 for format in list(formats.keys()):
                     checked = _check_single_format(signature, format, formats[format])
@@ -377,13 +389,15 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                     shuffled_border_score_right = []
                     shuffled_grid_score = []
                     shuffled_border_score_agg = []
-                    for i in range(len(shuffled_rate_maps)):
-                        # shuffled_map = shuffled_rate_maps[i]
-                        # shuffled_map_raw = shuffled_rate_map_raw[i]
-                        # if cylinder:
-                            # shuffled_map = flat_disk_mask(shuffled_map)
-                            # shuffled_map_raw = flat_disk_mask(shuffled_map_raw)
-                        shuffled_map, shuffled_map_raw, fields_map = spatial_shuffle_based_on_paper(rate_map)
+                    gr_score_nan_count = 0
+                    info_score_high_count = 0
+                    for i in range(1000):
+                        shuffled_map = shuffled_rate_maps[i]
+                        shuffled_map_raw = shuffled_rate_map_raw[i]
+                        if cylinder:
+                            shuffled_map = flat_disk_mask(shuffled_map)
+                            shuffled_map_raw = flat_disk_mask(shuffled_map_raw)
+                        # shuffled_map, shuffled_map_raw, fields_map = spatial_shuffle_with_incremental_field_placement(rate_map)
                         
                         # if i % 100 == 0:
                         #     fig = plt.figure(figsize=(4,4))
@@ -403,6 +417,9 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                         shuffled_sparsity.append(ratemap_stats_dict['sparsity'])
                         shuffled_selectivity.append(ratemap_stats_dict['selectivity'])
                         shuffled_coherence.append(rate_map_coherence(shuffled_map_raw, smoothing_factor=settings['smoothing_factor']))
+
+                        if spatial_information_content >= 2:
+                            info_score_high_count += 1
 
 
                         # shuffled_binmap = np.zeros(shuffled_map.shape)
@@ -454,7 +471,10 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                         shuffled_autocorr = autocorrelation(shuffled_map, use_map_directly=True, smoothing_factor=settings_dict['smoothing_factor'], arena_size=spatial_spike_train.arena_size)
 
                         gr_score = grid_score(None, use_autocorr_direclty=True, autocorr=shuffled_autocorr)
-                        shuffled_grid_score.append(gr_score)
+                        if gr_score == gr_score:
+                            shuffled_grid_score.append(gr_score)
+                        else:
+                            gr_score_nan_count += 1
 
 
                     current_statistics_sheet[headers_dict['shuffled_information_mean'] + str(excel_cell_index+1)] = np.mean(shuffled_information_content)
@@ -505,7 +525,10 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                     #     border_control_npy = np.vstack((border_control_npy, toadd))
                     # print('SHAPE2 HERE')
                     # print(border_control_npy.shape)
-                    # information_control_npy = np.hstack((information_control_npy, shuffled_information_content))
+
+                    curr_labels = np.array([file_end for x in range(len(shuffled_information_content))])
+                    information_control_npy = np.hstack((information_control_npy, shuffled_information_content))
+                    # information_control_npy_labels = np.hstack((information_control_npy_labels, curr_labels))
 
                     current_statistics_sheet[headers_dict['p_value_information'] + str(excel_cell_index+1)] = p_value_information
                     current_statistics_sheet[headers_dict['p_value_sparsity'] + str(excel_cell_index+1)] = p_value_sparsity
@@ -516,6 +539,11 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                     current_statistics_sheet[headers_dict['p_value_border_score_bottom'] + str(excel_cell_index+1)] = p_value_border_score_bottom
                     current_statistics_sheet[headers_dict['p_value_border_score_left'] + str(excel_cell_index+1)] = p_value_border_score_left
                     current_statistics_sheet[headers_dict['p_value_border_score_right'] + str(excel_cell_index+1)] = p_value_border_score_right
+
+                    current_statistics_sheet[headers_dict['gr_score_nan_count'] + str(excel_cell_index+1)] = gr_score_nan_count
+                    current_statistics_sheet[headers_dict['info_score_high_count'] + str(excel_cell_index+1)] = info_score_high_count
+
+                    
 
                     sptimes = spatial_spike_train.spike_times
                     t_stop = max(sptimes)
@@ -568,7 +596,8 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
 
     # np.save(border_path, border_control_npy)
 
-    # np.save(information_path, information_control_npy)
+    np.save(information_path, information_control_npy)
+    # np.save(information_path_labels, information_control_npy_labels)
 
 
 def plot_shuffled_dist(root_path, dists, quants, order, file_end):
@@ -849,11 +878,12 @@ if __name__ == '__main__':
 
     # MAKE SURE "field_sizes" IS THE LAST ELEMENT IN "csv_header_keys"
     csv_header = {}
-    csv_header_keys = ['name','date','depth','stim','information', 'shuffled_information_mean','shuffled_information_std','p_value_information',
+    csv_header_keys = ['name','date','depth','stim','information', 'shuffled_information_mean','shuffled_information_std',
+                        'info_score_high_count', 'p_value_information',
                        'selectivity', 'shuffled_selectivity_mean', 'shuffled_selectivity_std', 'p_value_selectivity',
                        'sparsity', 'shuffled_sparsity_mean', 'shuffled_sparsity_std', 'p_value_sparsity',
                        'coherence', 'shuffled_coherence_mean', 'shuffled_coherence_std', 'p_value_coherence',
-                       'grid_score', 'shuffled_grid_score_mean', 'shuffled_grid_score_std', 'p_value_grid_score',
+                       'grid_score', 'shuffled_grid_score_mean', 'shuffled_grid_score_std', 'gr_score_nan_count', 'p_value_grid_score',
                        'border_score_top', 'shuffled_border_score_top_mean', 'shuffled_border_score_top_std', 'p_value_border_score_top',
                         'border_score_bottom', 'shuffled_border_score_bottom_mean', 'shuffled_border_score_bottom_std', 'p_value_border_score_bottom',
                         'border_score_left', 'shuffled_border_score_left_mean', 'shuffled_border_score_left_std', 'p_value_border_score_left',
