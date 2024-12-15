@@ -5,6 +5,7 @@ sys.path.append(PROJECT_PATH)
 
 from _prototypes.cell_remapping.src.MEC_naming import MEC_naming_format, extract_name_mec
 from _prototypes.cell_remapping.src.LC_naming import LC_naming_format, extract_name_lc
+from _prototypes.cell_remapping.src.Hande_naming import Hande_naming_format, extract_name_hande
 from scripts.batch_map.LEC_naming import LEC_naming_format, extract_name_lec
 
 from skimage.measure import block_reduce
@@ -245,6 +246,9 @@ def read_data_from_fname(fname, naming_type, typ):
     elif naming_type == 'LC':
         name = extract_name_lc(fname)
         formats = LC_naming_format
+    elif naming_type == 'Hande':
+        name = extract_name_hande
+        formats = Hande_naming_format
 
     for format in list(formats.keys()):
         checked = _check_single_format(fname, format, formats[format])

@@ -13,6 +13,7 @@ sys.path.append(PROJECT_PATH)
 
 # project specific naming conventions
 from _prototypes.cell_remapping.src.MEC_naming import MEC_naming_format, extract_name_mec
+from _prototypes.cell_remapping.src.Hande_naming import Hande_naming_format, extract_name_hande
 from _prototypes.cell_remapping.src.LC_naming import LC_naming_format, extract_name_lc
 from scripts.batch_map.LEC_naming import LEC_naming_format, extract_name_lec
 
@@ -134,6 +135,9 @@ def filter_neurofunc_unmatched_object(file_dir, settings):
         elif settings['naming_type'] == 'LC':
             name = extract_name_lc(fname)
             formats = LC_naming_format
+        elif settings['naming_type'] == 'Hande':
+            name = extract_name_hande(fname)
+            formats = Hande_naming_format
 
         for format in list(formats.keys()):
             checked = _check_single_format(fname, format, formats[format])

@@ -10,6 +10,10 @@ import warnings
 from library.study_space import Session, Study, Animal
 from scripts.batch_map.LEC_naming import LEC_naming_format, extract_name_lec
 from _prototypes.cell_remapping.src.MEC_naming import MEC_naming_format, extract_name_mec
+from _prototypes.cell_remapping.src.LC_naming import LC_naming_format, extract_name_lc
+from _prototypes.cell_remapping.src.Hande_naming import Hande_naming_format, extract_name_hande
+
+
 import tkinter as tk
 from tkinter import filedialog
 import time
@@ -39,6 +43,10 @@ from library.map_utils import _speed2D
 from x_io.rw.axona.batch_read import make_study
 import pandas as pd
 import re
+import random
+from scipy.ndimage import gaussian_filter
+from scipy.spatial import distance
+
 
 """ SETTINGS AT THE BOTTOM OF FILE """
 
@@ -126,20 +134,33 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
 
     # grid_control_npy = []  
     # border_control_npy = [] 
+    # information_control_npy = []
 
-    grid_path = r"/home/apollo/Desktop/GusRemapDataSes1Control/grid_control_dist.npy"
-    if os.path.exists(grid_path):
-        grid_control_npy = np.load(grid_path)
-        assert len(grid_control_npy) > 0
-    else:
-        grid_control_npy = []
+    # grid_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/grid_control_dist.npy"
+    # if os.path.exists(grid_path):
+    #     grid_control_npy = np.load(grid_path)
+    #     assert len(grid_control_npy) > 0
+    # else:
+    #     grid_control_npy = []
 
-    border_path = r"/home/apollo/Desktop/GusRemapDataSes1Control/border_control_dist.npy"
-    if os.path.exists(border_path):
-        border_control_npy = np.load(border_path)
-        assert len(border_control_npy) > 0
+    # border_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/border_control_dist.npy"
+    # if os.path.exists(border_path):
+    #     border_control_npy = np.load(border_path)
+    #     assert len(border_control_npy) > 0
+    # else:
+    #     border_control_npy = []
+
+    information_path = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/information_control_dist.npy"
+    # information_path_labels = r"/home/apollo/Desktop/AllGusData/GusRemapDataSes1Control/information_control_dist_labels.npy"
+    if os.path.exists(information_path):
+        information_control_npy = np.load(information_path)
+        assert len(information_control_npy) > 0
+        # information_control_npy_labels = np.load(information_path_labels)
+        # assert len(information_control_npy_labels) > 0
+        # assert len(information_control_npy_labels) == len(information_control_npy)
     else:
-        border_control_npy = []
+        information_control_npy = []
+        # information_control_npy_labels = []
 
 
     for animalID in sorted_animal_ids:
@@ -210,9 +231,12 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                 elif settings['naming_type'] == 'MEC':
                         name = extract_name_mec(signature)
                         formats = MEC_naming_format
-                # elif settings['naming_type'] == 'LC':
-                #     name = extract_name_lc(fname)
-                #     formats = LC_naming_format
+                elif settings['naming_type'] == 'LC':
+                    name = extract_name_lc(fname)
+                    formats = LC_naming_format
+                elif settings['naming_type'] == 'Hande':
+                    name = extract_name_hande(fname)
+                    formats = Hande_naming_format
 
                 for format in list(formats.keys()):
                     checked = _check_single_format(signature, format, formats[format])
@@ -365,18 +389,37 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                     shuffled_border_score_right = []
                     shuffled_grid_score = []
                     shuffled_border_score_agg = []
-                    for i in range(len(shuffled_rate_maps)):
+                    gr_score_nan_count = 0
+                    info_score_high_count = 0
+                    for i in range(1000):
                         shuffled_map = shuffled_rate_maps[i]
                         shuffled_map_raw = shuffled_rate_map_raw[i]
                         if cylinder:
                             shuffled_map = flat_disk_mask(shuffled_map)
                             shuffled_map_raw = flat_disk_mask(shuffled_map_raw)
+                        # shuffled_map, shuffled_map_raw, fields_map = spatial_shuffle_with_incremental_field_placement(rate_map)
+                        
+                        # if i % 100 == 0:
+                        #     fig = plt.figure(figsize=(4,4))
+                        #     ax = plt.subplot(1,2,1)
+                        #     ax.imshow(rate_map)
+                        #     ax.set_title('True map')
+                        #     ax = plt.subplot(1,2,2)
+                        #     ax.imshow(shuffled_map)
+                        #     ax.set_title('Shuffled map')
+                        #     fig.suptitle(date+'_'+name+'_'+depth+'_'+tet_file[-1]+'_'+cell.cluster.cluster_label)
+                        #     fig.tight_layout()
+                        #     plt.show()
+
                         ratemap_stats_dict  = rate_map_stats(None, ratemap=shuffled_map, occmap=occ_map, override=True)
                         spatial_information_content = ratemap_stats_dict['spatial_information_content']
                         shuffled_information_content.append(spatial_information_content)
                         shuffled_sparsity.append(ratemap_stats_dict['sparsity'])
                         shuffled_selectivity.append(ratemap_stats_dict['selectivity'])
                         shuffled_coherence.append(rate_map_coherence(shuffled_map_raw, smoothing_factor=settings['smoothing_factor']))
+
+                        if spatial_information_content >= 2:
+                            info_score_high_count += 1
 
 
                         # shuffled_binmap = np.zeros(shuffled_map.shape)
@@ -428,7 +471,10 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                         shuffled_autocorr = autocorrelation(shuffled_map, use_map_directly=True, smoothing_factor=settings_dict['smoothing_factor'], arena_size=spatial_spike_train.arena_size)
 
                         gr_score = grid_score(None, use_autocorr_direclty=True, autocorr=shuffled_autocorr)
-                        shuffled_grid_score.append(gr_score)
+                        if gr_score == gr_score:
+                            shuffled_grid_score.append(gr_score)
+                        else:
+                            gr_score_nan_count += 1
 
 
                     current_statistics_sheet[headers_dict['shuffled_information_mean'] + str(excel_cell_index+1)] = np.mean(shuffled_information_content)
@@ -469,16 +515,20 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
 
                     plot_shuffled_dist(root_path, dists, quants, order, file_end)
 
-                    grid_control_npy = np.hstack((grid_control_npy, shuffled_grid_score))
-                    print('SHAPE HERE')
-                    print(grid_control_npy.shape)
-                    if len(border_control_npy) == 0:
-                        border_control_npy = np.array(shuffled_border_score_agg).reshape((len(shuffled_grid_score),4))
-                    else:
-                        toadd = np.array(shuffled_border_score_agg).reshape((len(shuffled_grid_score),4))
-                        border_control_npy = np.vstack((border_control_npy, toadd))
-                    print('SHAPE2 HERE')
-                    print(border_control_npy.shape)
+                    # grid_control_npy = np.hstack((grid_control_npy, shuffled_grid_score))
+                    # print('SHAPE HERE')
+                    # print(grid_control_npy.shape)
+                    # if len(border_control_npy) == 0:
+                    #     border_control_npy = np.array(shuffled_border_score_agg).reshape((len(shuffled_grid_score),4))
+                    # else:
+                    #     toadd = np.array(shuffled_border_score_agg).reshape((len(shuffled_grid_score),4))
+                    #     border_control_npy = np.vstack((border_control_npy, toadd))
+                    # print('SHAPE2 HERE')
+                    # print(border_control_npy.shape)
+
+                    curr_labels = np.array([file_end for x in range(len(shuffled_information_content))])
+                    information_control_npy = np.hstack((information_control_npy, shuffled_information_content))
+                    # information_control_npy_labels = np.hstack((information_control_npy_labels, curr_labels))
 
                     current_statistics_sheet[headers_dict['p_value_information'] + str(excel_cell_index+1)] = p_value_information
                     current_statistics_sheet[headers_dict['p_value_sparsity'] + str(excel_cell_index+1)] = p_value_sparsity
@@ -489,6 +539,11 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
                     current_statistics_sheet[headers_dict['p_value_border_score_bottom'] + str(excel_cell_index+1)] = p_value_border_score_bottom
                     current_statistics_sheet[headers_dict['p_value_border_score_left'] + str(excel_cell_index+1)] = p_value_border_score_left
                     current_statistics_sheet[headers_dict['p_value_border_score_right'] + str(excel_cell_index+1)] = p_value_border_score_right
+
+                    current_statistics_sheet[headers_dict['gr_score_nan_count'] + str(excel_cell_index+1)] = gr_score_nan_count
+                    current_statistics_sheet[headers_dict['info_score_high_count'] + str(excel_cell_index+1)] = info_score_high_count
+
+                    
 
                     sptimes = spatial_spike_train.spike_times
                     t_stop = max(sptimes)
@@ -537,9 +592,12 @@ def batch_map(study: Study, settings_dict: dict, saveDir=None, sum_sheet_count=N
     if settings_dict['saveMethod'] == 'one_for_parent':
         _save_wb(wb, root_path, sum_sheet_count=sum_sheet_count)
 
-    np.save(grid_path, grid_control_npy)
+    # np.save(grid_path, grid_control_npy)
 
-    np.save(border_path, border_control_npy)
+    # np.save(border_path, border_control_npy)
+
+    np.save(information_path, information_control_npy)
+    # np.save(information_path_labels, information_control_npy_labels)
 
 
 def plot_shuffled_dist(root_path, dists, quants, order, file_end):
@@ -619,17 +677,213 @@ def get_hd_score_for_cluster(hd_hist):
     r = np.sqrt(totx*totx + toty*toty)
     return r
 
+
+
+
+def spatial_shuffle_with_incremental_field_placement(ratemap):
+    # Step 1: Detect fields using the place_field function
+    s_image, n_s, fields_map, _, _ = map_blobs(ratemap, smoothing_factor=3)
+
+    num_fields = fields_map.max()  # Number of fields detected
+
+    # Start with an empty map for shuffled fields
+    shuffled_ratemap = np.zeros_like(ratemap)
+    occupied_positions = np.zeros_like(ratemap, dtype=bool)
+
+    # Track the original positions of all field bins
+    original_field_bins = [np.argwhere(fields_map == field_id) for field_id in range(1, num_fields + 1)]
+
+    # Step 2: Randomize the order of fields
+    field_order = list(range(num_fields))
+    random.shuffle(field_order)
+
+    # List to store non-field values from the new positions for filling holes
+    values_for_filling_holes = []
+
+    # Step 3: Incremental Placement of Bins
+    for field_index in field_order:
+        field_bins = original_field_bins[field_index]
+
+        # Step 3a: Place the peak bin first
+        peak_bin = field_bins[np.argmax(ratemap[tuple(field_bins.T)])]
+        new_peak_position = (
+            random.randint(0, ratemap.shape[0] - 1),
+            random.randint(0, ratemap.shape[1] - 1)
+        )
+
+        # Collect the original value at the new peak position if it was not part of a field
+        if fields_map[new_peak_position[0], new_peak_position[1]] == 0:
+            values_for_filling_holes.append(ratemap[new_peak_position[0], new_peak_position[1]])
+
+        # Place the peak bin in the new position
+        shuffled_ratemap[new_peak_position[0], new_peak_position[1]] += ratemap[peak_bin[0], peak_bin[1]]
+        occupied_positions[new_peak_position[0], new_peak_position[1]] = True
+
+        # Step 3b: Place all other bins relative to the new peak position
+        for bin_position in field_bins:
+            if np.array_equal(bin_position, peak_bin):
+                continue  # Skip the peak bin as it's already placed
+
+            rel_pos = bin_position - peak_bin
+            new_position = new_peak_position + rel_pos
+            new_position = new_position % np.array(shuffled_ratemap.shape)
+
+            # Collect the original value at the new position if it was not part of a field
+            if fields_map[new_position[0], new_position[1]] == 0:
+                values_for_filling_holes.append(ratemap[new_position[0], new_position[1]])
+
+            # Place the field bin in the new position
+            shuffled_ratemap[new_position[0], new_position[1]] += ratemap[bin_position[0], bin_position[1]]
+            occupied_positions[new_position[0], new_position[1]] = True
+
+    # Step 4: Fill in the holes left by the moved fields using the collected non-field values
+    remaining_bins = np.argwhere(shuffled_ratemap == 0)
+    if len(values_for_filling_holes) > len(remaining_bins):
+        # extend the list of values to fill holes by repeating the values
+        values_for_filling_holes = values_for_filling_holes * (len(values_for_filling_holes) // len(remaining_bins) + 1)
+
+    for hole_bin in remaining_bins:
+        if values_for_filling_holes:
+            chosen_value = random.choice(values_for_filling_holes)
+            shuffled_ratemap[tuple(hole_bin)] = chosen_value
+
+    # Step 5: Fill in the untouched bins with non-field areas from the original map
+    untouched_bins = np.logical_not(occupied_positions)
+    non_field_bins = fields_map == 0
+    fill_bins = untouched_bins & non_field_bins
+    shuffled_ratemap[fill_bins] = ratemap[fill_bins]
+
+    # gaussian smoothing
+    shuffled_ratemap_raw = np.copy(shuffled_ratemap)
+    shuffled_ratemap = shuffled_ratemap / np.sum(shuffled_ratemap)
+    shuffled_ratemap = gaussian_filter(shuffled_ratemap, sigma=2)
+    shuffled_ratemap = shuffled_ratemap / np.sum(shuffled_ratemap)
+
+    return shuffled_ratemap, shuffled_ratemap_raw, fields_map
+
+
+def spatial_shuffle_based_on_paper(ratemap):
+    # Step 1: Segment fields using `map_blobs` (includes smoothing and segmentation)
+    s_image, n_s, fields_map, _, _ = map_blobs(ratemap, smoothing_factor=3)
+
+    num_fields = fields_map.max()  # Number of fields detected
+
+    # Step 2: Initialize the shuffled ratemap and occupied positions map
+    shuffled_ratemap = np.zeros_like(ratemap)  # Start with an empty map
+    occupied_positions = np.zeros_like(ratemap, dtype=bool)  # Track occupied positions
+
+    # Track the original positions of all field bins
+    original_field_bins = [np.argwhere(fields_map == field_id) for field_id in range(1, num_fields + 1)]
+
+    # Step 3: Identify peaks for each field and randomly place them
+    field_peaks = []
+    field_positions = []  # Track all positions of bins to shuffle them
+
+    for field_id in range(1, num_fields + 1):
+        # Identify bins belonging to the current field
+        field_bins = np.argwhere(fields_map == field_id)
+        field_positions.append(field_bins)
+
+        # Find the peak (local maximum) within the field
+        peak_bin = field_bins[np.argmax(ratemap[tuple(field_bins.T)])]
+        field_peaks.append((field_id, peak_bin))
+
+    # Randomly shuffle the order of peaks
+    random.shuffle(field_peaks)
+
+    # Randomly select positions for field peaks in the empty map
+    new_peak_positions = []
+    for field_id, peak_bin in field_peaks:
+        found_position = False
+        while not found_position:  # Loop until an unoccupied position is found
+            new_position = (
+                random.randint(0, ratemap.shape[0] - 1),
+                random.randint(0, ratemap.shape[1] - 1)
+            )
+            if not occupied_positions[new_position]:
+                new_peak_positions.append((field_id, new_position))
+                occupied_positions[new_position] = True
+
+                # Place the peak bin in the new position
+                shuffled_ratemap[new_position] = ratemap[peak_bin[0], peak_bin[1]]
+                found_position = True  # Exit the loop when a valid position is found
+
+    # Step 4: Iteratively place bins in the shuffled ratemap while maintaining relative positions
+    for (field_id, new_peak_position) in new_peak_positions:
+        field_bins = field_positions[field_id - 1]
+        peak_bin = field_bins[np.argmax(ratemap[tuple(field_bins.T)])]
+
+        for bin_position in field_bins:
+            if np.array_equal(bin_position, peak_bin):
+                continue  # Skip the peak bin as it's already placed
+
+            # Calculate the relative position to the peak
+            rel_pos = bin_position - peak_bin
+            ideal_position = new_peak_position + rel_pos
+
+            # Find the nearest available position using city-block distance
+            if not (0 <= ideal_position[0] < ratemap.shape[0] and 0 <= ideal_position[1] < ratemap.shape[1]) or occupied_positions[ideal_position[0], ideal_position[1]]:
+                # Ideal position is not available, find the nearest available spot
+                ideal_position = find_nearest_available_position(occupied_positions, ideal_position)
+
+            # Place the bin in the available position
+            shuffled_ratemap[ideal_position[0], ideal_position[1]] = ratemap[bin_position[0], bin_position[1]]
+            occupied_positions[ideal_position[0], ideal_position[1]] = True
+
+    # Step 5: Place non-field bins in their original positions if possible
+    non_field_bins = np.argwhere(fields_map == 0)  # Bins not part of any field
+    non_field_values_to_place = []  # Track non-field bins that can't be placed in their original location
+
+    for bin_position in non_field_bins:
+        if not occupied_positions[tuple(bin_position)]:
+            # Place these bins in their original positions in the shuffled ratemap
+            shuffled_ratemap[tuple(bin_position)] = ratemap[tuple(bin_position)]
+            occupied_positions[tuple(bin_position)] = True
+        else:
+            # If the original position is occupied by a moved field bin, add it to the list
+            non_field_values_to_place.append(ratemap[tuple(bin_position)])
+
+    # Step 6: Randomly fill remaining empty positions with non-field values
+    remaining_bins = np.argwhere(shuffled_ratemap == 0)
+    for hole_bin in remaining_bins:
+        if non_field_values_to_place:
+            chosen_value = random.choice(non_field_values_to_place)
+            shuffled_ratemap[tuple(hole_bin)] = chosen_value
+            non_field_values_to_place.remove(chosen_value)  # Remove the placed value to avoid reuse
+
+    # gaussian smoothing
+    shuffled_ratemap_raw = np.copy(shuffled_ratemap)
+    shuffled_ratemap = shuffled_ratemap / np.sum(shuffled_ratemap)
+    shuffled_ratemap = gaussian_filter(shuffled_ratemap, sigma=2)
+    shuffled_ratemap = shuffled_ratemap / np.sum(shuffled_ratemap)
+
+    return shuffled_ratemap, shuffled_ratemap_raw, fields_map
+
+def find_nearest_available_position(occupied_positions, ideal_position):
+    """
+    Finds the nearest available position in the shuffled map using city-block distance.
+    """
+    available_positions = np.argwhere(~occupied_positions)  # Positions that are not occupied
+    if len(available_positions) == 0:  # All positions are filled, should never happen
+        raise ValueError("No available positions to place field bin!")
+    # Calculate city-block distances to all available positions
+    distances = distance.cdist([ideal_position], available_positions, metric='cityblock')
+    nearest_position_idx = np.argmin(distances)
+    return tuple(available_positions[nearest_position_idx])
+
+
 if __name__ == '__main__':
 
     ######################################################## EDIT BELOW HERE ########################################################
 
     # MAKE SURE "field_sizes" IS THE LAST ELEMENT IN "csv_header_keys"
     csv_header = {}
-    csv_header_keys = ['name','date','depth','stim','information', 'shuffled_information_mean','shuffled_information_std','p_value_information',
+    csv_header_keys = ['name','date','depth','stim','information', 'shuffled_information_mean','shuffled_information_std',
+                        'info_score_high_count', 'p_value_information',
                        'selectivity', 'shuffled_selectivity_mean', 'shuffled_selectivity_std', 'p_value_selectivity',
                        'sparsity', 'shuffled_sparsity_mean', 'shuffled_sparsity_std', 'p_value_sparsity',
                        'coherence', 'shuffled_coherence_mean', 'shuffled_coherence_std', 'p_value_coherence',
-                       'grid_score', 'shuffled_grid_score_mean', 'shuffled_grid_score_std', 'p_value_grid_score',
+                       'grid_score', 'shuffled_grid_score_mean', 'shuffled_grid_score_std', 'gr_score_nan_count', 'p_value_grid_score',
                        'border_score_top', 'shuffled_border_score_top_mean', 'shuffled_border_score_top_std', 'p_value_border_score_top',
                         'border_score_bottom', 'shuffled_border_score_bottom_mean', 'shuffled_border_score_bottom_std', 'p_value_border_score_bottom',
                         'border_score_left', 'shuffled_border_score_left_mean', 'shuffled_border_score_left_std', 'p_value_border_score_left',

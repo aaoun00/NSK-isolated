@@ -245,15 +245,21 @@ def split_agg_feature_array(agg_session_feats, agg_session_ids, agg_cell_ids):
         cell_ids = sorted(np.unique(session_cells))
         indiv_cell_feats = []
         for cell in cell_ids:
+            # print('in')
+            # print(ses_id, session_cells)
             cell_idx = np.where(session_cells == cell)[0]
+            # print(cell, cell_idx)
+            # print(len(agg_session_feats[ses_idx][cell_idx]))
             indiv_cell_feats.append(agg_session_feats[ses_idx][cell_idx])
+            # print(agg_session_feats[ses_idx][cell_idx])
+            # print('out')
         indiv_ses_feats.append(np.array(indiv_cell_feats))
-    print(unique_ses_ids)
-    print(len(indiv_ses_feats))
-    print(len(indiv_ses_feats[0]))
-    print(len(indiv_ses_feats[0][0]))
-    print(len(indiv_ses_feats[0][0][0]))
-    print(indiv_ses_feats.shape)
+    # print(unique_ses_ids)
+    # print(len(indiv_ses_feats))
+    # print(len(indiv_ses_feats[0]))
+    # print(len(indiv_ses_feats[0][0]))
+    # print(len(indiv_ses_feats[0][0][0]))
+    # print(indiv_ses_feats.shape)
     return np.array(indiv_ses_feats), unique_ses_ids
 
 def reorder_unmatched_cells(cross_session_matches):
@@ -756,11 +762,13 @@ if __name__ == '__main__':
     """ If a setting is not used for your analysis (e.g. smoothing_factor), just pass in an arbitrary value or pass in 'None' """
     STUDY_SETTINGS = {
 
-        'ppm': 485,  # EDIT HERE
+        'ppm': 589,  # EDIT HERE
 
         'smoothing_factor': 3, # EDIT HERE
 
         'useMatchedCut': False,  # EDIT HERE, set to False if you want to use runUnitMatcher, set to True after to load in matched.cut file
+
+        'arena_size' : None
     }
 
 
