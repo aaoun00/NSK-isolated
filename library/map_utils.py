@@ -278,7 +278,8 @@ def _temp_occupancy_map(position: Position2D, smoothing_factor, interp_size=(64,
 
     # Resize ratio
     # row_resize, column_resize = _compute_resize_ratio(arena_size, base_resolution=interp_size[0])
-    row_resize, column_resize = interp_size
+    # print(interp_size)
+    row_resize, column_resize = interp_size[0], interp_size[1]
 
     # Initialize empty map
     occ_map_raw = np.zeros((row_resize,column_resize))
@@ -349,7 +350,7 @@ def _temp_spike_map(pos_x: np.ndarray, pos_y: np.ndarray, pos_t: np.ndarray,
 
     # Resize ratio
     # row_resize, column_resize = _compute_resize_ratio(arena_size, base_resolution=interp_size[0])
-    row_resize, column_resize = interp_size
+    row_resize, column_resize = interp_size[0], interp_size[1]
 
     # Instantiate empty maps
     spike_map_raw = np.zeros((row_resize,column_resize))
@@ -404,7 +405,7 @@ def _temp_spike_map_new(pos_x, pos_y, pos_t, arena_size, spike_x, spike_y, smoot
     # stop()
 
 
-    row_resize, column_resize = interp_size
+    row_resize, column_resize = interp_size[0], interp_size[1]
     spike_map_raw = np.zeros((row_resize, column_resize))
     row_values = np.linspace(max_x, min_x, row_resize)
     column_values = np.linspace(min_y, max_y, column_resize)

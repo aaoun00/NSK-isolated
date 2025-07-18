@@ -193,7 +193,7 @@ class HaftingOccupancyMap():
             print('overriding session smoothing factor for input smoothing facator')
 
     def get_occupancy_map(self, smoothing_factor=None, new_size=None, useMinMaxPos=False):
-        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape[0]) == True:
+        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape) == True:
             if self.smoothing_factor != None:
                 smoothing_factor = self.smoothing_factor
                 assert smoothing_factor != None, 'Need to add smoothing factor to function inputs'
@@ -212,7 +212,7 @@ class HaftingOccupancyMap():
 
         return self.map_data, self.raw_map_data, self.coverage
 
-    def compute_occupancy_map(self, pos_t, pos_x, pos_y, arena_size, smoothing_factor, new_size=64, mask_threshold=1, useMinMaxPos=False):
+    def compute_occupancy_map(self, pos_t, pos_x, pos_y, arena_size, smoothing_factor, new_size=(64, 64), mask_threshold=1, useMinMaxPos=False):
 
         # arena_ratio = arena_size[0]/arena_size[1]
         # h = smoothing_factor #smoothing factor in centimeters
@@ -251,7 +251,7 @@ class HaftingOccupancyMap():
 
 
 
-        valid_occupancy_map, raw_occ, coverage = _temp_occupancy_map(self.spatial_spike_train.position, self.smoothing_factor, interp_size=(new_size, new_size),  useMinMaxPos=useMinMaxPos)
+        valid_occupancy_map, raw_occ, coverage = _temp_occupancy_map(self.spatial_spike_train.position, self.smoothing_factor, interp_size=new_size,  useMinMaxPos=useMinMaxPos)
 
         return valid_occupancy_map, raw_occ, coverage
 
@@ -289,7 +289,7 @@ class HaftingSpikeMap():
     #     return spatial_spike_train
 
     def get_spike_map(self, smoothing_factor=None, new_size=None, shuffle=False, n_repeats=None, useMinMaxPos=False):
-        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape[0]) == True or shuffle == True:
+        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape) == True or shuffle == True:
             if self.smoothing_factor != None:
                 smoothing_factor = self.smoothing_factor
                 assert smoothing_factor != None, 'Need to add smoothing factor to function inputs'
@@ -324,8 +324,8 @@ class HaftingSpikeMap():
                 # self.map_data = np.asarray(mdatas)
                 # self.map_data_raw = np.asarray(mdatas_raw)
                 assert spike_x.shape[0] == n_repeats, 'Number of repeats {} does not match number of shuffled spike trains {}'.format(n_repeats, spike_x.shape[0])
-                map_data = np.empty((n_repeats, new_size, new_size))
-                map_data_raw = np.empty((n_repeats, new_size, new_size))
+                map_data = np.empty((n_repeats, new_size[0], new_size[1]))
+                map_data_raw = np.empty((n_repeats, new_size[0], new_size[1]))
                 for i in range(n_repeats):
                     spike_map, spike_map_raw = self.compute_spike_map(
                         spike_x[i], spike_y[i], smoothing_factor, self.arena_size, new_size=new_size,  useMinMaxPos=useMinMaxPos
@@ -343,7 +343,7 @@ class HaftingSpikeMap():
         else:
             return self.map_data, self.map_data_raw
 
-    def compute_spike_map(self, spike_x, spike_y, smoothing_factor, arena_size, new_size=64, useMinMaxPos=False):
+    def compute_spike_map(self, spike_x, spike_y, smoothing_factor, arena_size, new_size=(64, 64), useMinMaxPos=False):
         # arena_ratio = arena_size[0]/arena_size[1]
         # # h = smoothing_factor #smoothing factor in centimeters
 
@@ -375,7 +375,7 @@ class HaftingSpikeMap():
         # spike_map = _interpolate_matrix(spike_map, cv2_interpolation_method=cv2.INTER_NEAREST)
 
         # spike_map, spike_map_raw = _temp_spike_map(self.spatial_spike_train.x, self.spatial_spike_train.y, self.spatial_spike_train.t, arena_size, spike_x, spike_y, smoothing_factor, interp_size=(new_size,new_size))
-        spike_map, spike_map_raw = _temp_spike_map_new(self.spatial_spike_train.x, self.spatial_spike_train.y, self.spatial_spike_train.t, arena_size, spike_x, spike_y, smoothing_factor, interp_size=(new_size,new_size), useMinMaxPos=useMinMaxPos)
+        spike_map, spike_map_raw = _temp_spike_map_new(self.spatial_spike_train.x, self.spatial_spike_train.y, self.spatial_spike_train.t, arena_size, spike_x, spike_y, smoothing_factor, interp_size=new_size, useMinMaxPos=useMinMaxPos)
 
         # for i in range(len(spike_map)):
         #     for j in range(len(spike_map[i])):
@@ -422,19 +422,21 @@ class HaftingRateMap():
             pass
 
     def get_rate_map(self, smoothing_factor=None, new_size=None, shuffle=False, n_repeats=None, settings_arena_size=None):
-        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape[0]) == True or shuffle == True:
+        if self.map_data is None or (self.map_data is not None and new_size != self.map_data.shape) == True or shuffle == True:
             if self.map_data is None:
                 # print('computing rate map bcs map_data is None')
                 pass
-            elif new_size != self.map_data.shape[0]:
+            elif new_size != self.map_data.shape:
             # and new_size != len(self.map_data[0]):
                 # print('computing rate map bcs new_size {} != self.map_data.shape[0] {}'.format(new_size, self.map_data.shape[0]))
                 pass
             elif shuffle == True:
                 # print('computing rate map bcs shuffle == True')
                 pass
-            elif new_size != len(self.map_data[0]):
+            elif new_size[0] != len(self.map_data[0]):
                 # print('computing unshuffled rate map bcs self.var is set to shuffled dist')
+                pass
+            elif new_size[1] != len(self.map_data[1]):
                 pass
             
             # elif shuffle == True and new_size != len(self.map_data[0]):
