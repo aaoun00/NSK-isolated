@@ -212,9 +212,11 @@ def _get_ratemap_bucket_midpoints(arena_size, y, x):
         if len(arena_width) > 0:
             arena_width = arena_width[0]
 
-    # this is the step size between each bucket, so 0 to height step is first bucket, height_step to height_step*2 is next and so one
-    height_step = arena_height/x
-    width_step = arena_width/y
+    # # this is the step size between each bucket, so 0 to height step is first bucket, height_step to height_step*2 is next and so one
+    # height_step = arena_height/x
+    # width_step = arena_width/y
+    height_step = arena_height/y
+    width_step = arena_width/x
 
     # convert height/width to arrayswith 64 bins, this gets us our buckets
     height = np.arange(0,arena_height, height_step)
@@ -341,19 +343,19 @@ def _get_spk_pts(spatial_spike_train):
 
 def _get_valid_midpoints(arena_size, y, x, row, col):
     height_bucket_midpoints, width_bucket_midpoints = _get_ratemap_bucket_midpoints(arena_size, y, x)
+    # print(height_bucket_midpoints, width_bucket_midpoints, row, col)
     height_bucket_midpoints = height_bucket_midpoints[row]
     width_bucket_midpoints = width_bucket_midpoints[col]
     # set up (x,y) pairs of bucket midpoints
     coord_buckets = np.array(list(map(lambda x, y: [height_bucket_midpoints[x],width_bucket_midpoints[y]], row, col)))
     
     return height_bucket_midpoints, width_bucket_midpoints, coord_buckets
-                                        
+                
 # valid fr rate bins
 def _get_valid_weight_bins(ratemap):
     row, col = np.where(~np.isnan(ratemap))
     weights = np.array(list(map(lambda x, y: ratemap[x,y], row, col)))
     return weights, row, col
-          
 
 # same as above
 def scale_points(pts):

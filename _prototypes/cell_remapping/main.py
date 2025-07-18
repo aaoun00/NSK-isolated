@@ -91,7 +91,7 @@ def main(overwrite_settings=None):
             
             if len(study.animals) > 0 and len(study.animals[0].sessions) > 0:
                 print('SAVING OUTPUT FOR DIRECTORY ' + str(subdir))
-                # _save_output(output, subdir, start_time)
+                # _save_output(output, subdir) # , start_time)
             else:
                 print('NO DATA FOR DIRECTORY ' + str(subdir))
 
@@ -148,9 +148,9 @@ def main(overwrite_settings=None):
 
 def _save_output(output, output_path):
 
-    for ky in output['centroid']:
-        print(ky)
-        print(len(output['centroid'][ky]))
+    # for ky in output['centroid']:
+    #     print(ky)
+    #     print(len(output['centroid'][ky]))
 
     if 'regular' in output:
         df = pd.DataFrame(output['regular'])

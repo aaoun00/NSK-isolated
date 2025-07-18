@@ -16,9 +16,9 @@ GLOBAL SETTINGS
 """
 # settings_dict['single_tet'] = 7
 settings_dict['session']['channel_count'] = 4
-settings_dict['ses_limit'] = 3
-settings_dict['arena_size'] = None
-settings_dict['ppm'] = 485 # EDIT HERE (will auto read from file if None, otherwise will override with this value)
+settings_dict['ses_limit'] = None
+settings_dict['arena_size'] = (10, 100)
+settings_dict['ppm'] = 589 # EDIT HERE (will auto read from file if None, otherwise will override with this value)
 settings_dict['smoothing_factor'] = 3 # EDIT HERE (for plotting)
 settings_dict['speed_lowerbound'] = 0
 settings_dict['speed_upperbound'] = 100
@@ -28,12 +28,12 @@ settings_dict['n_shuffle_projections'] = 10**2 # EDIT HERE (10**3 is slow,  50 (
 settings_dict['type'] = 'object' # EDIT HERE # Currently only 'object' is supported so no need to change (will add e.g. angle later)
 # Type is used to read angle or other (e.g. odor) from filename
 ##### ratemap size setting (16,16) --> tradeoff between speed and accuracy
-settings_dict['ratemap_dims'] = (32,32) # EDIT HERE (16,16) is default, (32,32) is slower but more accurate,
-settings_dict['disk_arena'] = True # EDIT HERE. IF TRUE WILL FORCE DISK. IF FALSE WILL CHECK FILE NAME TO SEE IF TRUE OR NOT
+settings_dict['ratemap_dims'] = (1,16) # EDIT HERE (16,16) is default, (32,32) is slower but more accurate,
+settings_dict['disk_arena'] = False # EDIT HERE. IF TRUE WILL FORCE DISK. IF FALSE WILL CHECK FILE NAME TO SEE IF TRUE OR NOT
 settings_dict['normalizeRate'] = True # EDIT HERE --> NORMALIZED FOR ALL CASES 
 settings_dict['normalizePos'] = False
 settings_dict['normalizeTime'] = False
-settings_dict['naming_type'] = 'LEC' # EDIT HERE --> 'MEC' or 'LEC' or 'LC'
+settings_dict['naming_type'] = 'Hande' # EDIT HERE --> 'MEC' or 'LEC' or 'LC'
 settings_dict['rotate_evening'] = False
 settings_dict['rotate_angle'] = 90
 # sub2 1.xlsx is 32,32 shuffle = 500 with jit - 6062.33 seconds
@@ -48,7 +48,7 @@ IF YOU ARE DOING REGULAR REMAPPING
 """
 
 settings_dict['runRegular'] = True # EDIT HERE
-settings_dict['plotRegular'] = False # EDIT HERE
+settings_dict['plotRegular'] = True # EDIT HERE
 settings_dict['rate_scores'] = ['whole']
 # ,'spike_density']
 # ['whole', 'spike_density']
@@ -61,7 +61,7 @@ IF YOU ARE DOING OBJECT REMAPPING
 """
 
 settings_dict['hasObject'] = False # EDIT HERE
-settings_dict['plotObject'] = True # EDIT HERE
+settings_dict['plotObject'] = False # EDIT HERE
 settings_dict['object_scores'] = ['whole', 'field', 'binary', 'centroid', 'spike_density']
 # settings_dict['grid_sample_threshold'] = 3.2 # EDIT HERE, euclidean distance
 settings_dict['spacing'] = 2 # EDIT HERE, same unit as arena height and width

@@ -48,8 +48,8 @@ def _aggregate_cell_info(animal, settings):
     for k in range(int(max_matched_cell_count)):
         cell_label = k + 1
         prev_field_size_len = None 
-        print('search2')
-        print(animal.animal_id, max_matched_cell_count, animal.sessions.keys())
+        # print('search2')
+        # print(animal.animal_id, max_matched_cell_count, animal.sessions.keys())
         for i in range(len(list(animal.sessions.keys()))):
             seskey = list(animal.sessions.keys())[i]
             # seskey = 'session_' + str(i+1)
@@ -80,9 +80,9 @@ def _aggregate_cell_info(animal, settings):
                 rate_map_obj = spatial_spike_train.get_map('rate')
                 
                 if settings['normalizeRate']:
-                    rate_map, _ = rate_map_obj.get_rate_map(new_size = settings['ratemap_dims'][0])
+                    rate_map, _ = rate_map_obj.get_rate_map(new_size = settings['ratemap_dims'])
                 else:
-                    _, rate_map = rate_map_obj.get_rate_map(new_size = settings['ratemap_dims'][0])
+                    _, rate_map = rate_map_obj.get_rate_map(new_size = settings['ratemap_dims'])
                 assert rate_map.shape == (settings['ratemap_dims'][0], settings['ratemap_dims'][1]), 'Wrong ratemap shape {} vs settings shape {}'.format(rate_map.shape, (settings['ratemap_dims'][0], settings['ratemap_dims'][1]))
                 
                 if settings['downsample']:
@@ -210,8 +210,10 @@ def collect_shuffled_ratemaps(animal_cell_ratemaps, settings):
                                 if settings['runRegular']:
 
                                     # get fr rate valid bins
+                                    # print(source_map.shape, target_map.shape)
                                     source_weights, row_prev, col_prev = _get_valid_weight_bins(source_map)
                                     target_weights, row_curr, col_curr = _get_valid_weight_bins(target_map)
+                                    # print(source_weights.shape, target_weights.shape)
                                         
                                     prev_height_bucket_midpoints, prev_width_bucket_midpoints, coord_buckets_prev = _get_valid_midpoints(prev_spatial_spike_train.arena_size, y, x, row_prev, col_prev)
                                     curr_height_bucket_midpoints, curr_width_bucket_midpoints, coord_buckets_curr = _get_valid_midpoints(curr_spatial_spike_train.arena_size, y, x, row_curr, col_curr)
@@ -352,9 +354,9 @@ def collect_shuffled_ratemaps(animal_cell_ratemaps, settings):
 
 def get_rate_map(rate_map_obj, ratemap_dims,normalizeRate):
     if normalizeRate:
-        rate_map, _ = rate_map_obj.get_rate_map(new_size = ratemap_dims[0])
+        rate_map, _ = rate_map_obj.get_rate_map(new_size = ratemap_dims)
     else:
-        _, rate_map = rate_map_obj.get_rate_map(new_size = ratemap_dims[0])
+        _, rate_map = rate_map_obj.get_rate_map(new_size = ratemap_dims)
 
     assert rate_map.shape == (ratemap_dims[0], ratemap_dims[1]), 'Wrong ratemap shape {} vs settings shape {}'.format(rate_map.shape, (ratemap_dims[0], ratemap_dims[1]))
 
