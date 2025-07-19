@@ -905,17 +905,17 @@ if __name__ == '__main__':
     session_settings = {'channel_count': 4, 'animal': animal, 'devices': devices, 'implant': implant}
 
     """ FOR YOU TO EDIT """
-    settings = {'ppm': 485, 'session':  session_settings, 'smoothing_factor': 3, 'useMatchedCut': True}
+    settings = {'ppm': 511, 'session':  session_settings, 'smoothing_factor': 3, 'useMatchedCut': True}
     """ FOR YOU TO EDIT """
 
-    settings['disk_arena'] = True # -->
+    settings['disk_arena'] = False # -->
 
     settings['tasks'] = tasks # --> change tasks array to change tasks are run
     settings['plotTasks'] = plotTasks # --> change plot tasks array to change asks taht are plotted
     settings['header'] = csv_header # --> change csv_header header to change tasks that are saved to csv
 
     """ FOR YOU TO EDIT """
-    settings['naming_type'] = 'LEC'
+    settings['naming_type'] = 'LC'
     settings['arena_size'] = None
     settings['speed_lowerbound'] = 0
     settings['speed_upperbound'] = 99

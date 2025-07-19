@@ -126,7 +126,7 @@ def compute_remapping(study, settings, data_dir):
 
 
                 cylinder = check_cylinder(fname, settings['disk_arena'])
-        
+                print(settings['naming_type'])
                 stim, depth, name, date = read_data_from_fname(fname, settings['naming_type'], settings['type'])
 
                 object_location = check_object_location(stim, settings['hasObject'])

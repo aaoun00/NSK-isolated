@@ -88,7 +88,7 @@ def _grab_tetrode_cut_position_files(paths: list, pos_files=[], cut_files=[], te
     if len(paths) == 1 and os.path.isdir(paths[0]):
         files = os.listdir(paths[0])
         for file in files:
-            #file = file.decode()
+            # file = file.decode()
             fpath = paths[0] + '/' + file
             if os.path.isdir(fpath) and 'git' not in fpath:
                 cut_files, tetrode_files, pos_files, matched_cut_files, animal_dir_names = _grab_tetrode_cut_position_files(os.listdir(fpath), pos_files=pos_files, cut_files=cut_files, tetrode_files=tetrode_files, matched_cut_files=matched_cut_files, animal_dir_names=animal_dir_names, parent_path=fpath)

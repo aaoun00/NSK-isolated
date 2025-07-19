@@ -210,7 +210,7 @@ if __name__ == '__main__':
         'iso_dist': 7.5,
         'ISI_mean': 1,
         'firing_rate': 80,
-        'naming_type': 'LEC'
+        'naming_type': 'LC'
     }
 
     start_time = time.time()
