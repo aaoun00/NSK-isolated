@@ -272,14 +272,14 @@ def _temp_occupancy_map(position: Position2D, smoothing_factor, interp_size=(64,
 
     # arena_size = (abs(max_y-min_y), abs(max_x - min_x)) # (height, width)
 
-    print('search here')
-    print(arena_size, min_x, max_x, min_y, max_y)
-    print(pos_x, pos_y)
+    # print('search here')
+    # print(arena_size, min_x, max_x, min_y, max_y)
+    # print(pos_x, pos_y)
 
     # Resize ratio
     # row_resize, column_resize = _compute_resize_ratio(arena_size, base_resolution=interp_size[0])
-    print(interp_size)
-    stop()
+    # print(interp_size)
+    # stop()
     row_resize, column_resize = interp_size[0], interp_size[1]
 
     # Initialize empty map
