@@ -237,7 +237,6 @@ def list_to_array(*lst):
     else:
         return np.array(lst[0]) if isinstance(lst[0], list) else lst[0]
 
-
 def read_data_from_fname(fname, naming_type, typ):
     if naming_type == 'LEC':
         group, name = extract_name_lec(fname)
@@ -249,7 +248,7 @@ def read_data_from_fname(fname, naming_type, typ):
         name = extract_name_lc(fname)
         formats = LC_naming_format
     elif naming_type == 'Hande':
-        name = extract_name_hande
+        name = extract_name_hande(fname)
         formats = Hande_naming_format
 
     for format in list(formats.keys()):
